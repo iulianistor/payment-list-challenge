@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Container, ClearButton, FlexRow, SearchButton, SearchInput, Title } from "./components";
+import { Container, ClearButton, FlexRow, SearchButton, SearchInput, Select, Title } from "./components";
 import { I18N } from "../constants/i18n";
 import { getPayments } from "../services/payments";
 import { useQuery } from "@tanstack/react-query";
 import { PaymentsTable } from "./PaymentsTable";
+import { CURRENCIES } from "../constants";
 
 // keeping this in the UI layer ebecause this is responsible for rendering loading, error and empty states, and I want to keep the API logic in the service layer
 // const EMPTY_PAYMENTS_RESPONSE: PaymentSearchResponse = {
@@ -16,12 +17,14 @@ import { PaymentsTable } from "./PaymentsTable";
 export const PaymentsPage = () => {
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
+  const [currency, setCurrency] = useState("");
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["payments", search],
+    queryKey: ["payments", search, currency], //ensure that the query is refetched when search or currency changes
     queryFn: () =>
       getPayments({
         search,
+        currency,
         page: 1,
         pageSize: 5,
       }),
@@ -30,7 +33,7 @@ export const PaymentsPage = () => {
   // const paymentsData =
   //   data ?? EMPTY_PAYMENTS_RESPONSE;
 
-  const hasActiveFilters = Boolean(search); //|| currency
+  const hasActiveFilters = Boolean(search || currency);
 
   const handleSearch = () => {
     setSearch(searchInput.trim());
@@ -39,6 +42,7 @@ export const PaymentsPage = () => {
   const handleClear = () => {
     setSearchInput("");
     setSearch("");
+    setCurrency("");
   };
 
   return (
@@ -53,6 +57,23 @@ export const PaymentsPage = () => {
           placeholder={I18N.SEARCH_PLACEHOLDER}
           aria-label={I18N.SEARCH_LABEL}
         />
+
+        <Select
+          aria-label={I18N.CURRENCY_FILTER_LABEL}
+          value={currency}
+          onChange={(e) => setCurrency(e.target.value)}
+          style={{ marginLeft: 8 }}
+        >
+          <option value="">{I18N.CURRENCIES_OPTION}</option>
+          {CURRENCIES.filter(c =>
+            ["USD", "EUR", "GBP", "AUD", "CAD", "ZAR"].includes(c)
+          ).map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </Select>
+
         <SearchButton onClick={handleSearch}>
           {I18N.SEARCH_BUTTON}
         </SearchButton>
