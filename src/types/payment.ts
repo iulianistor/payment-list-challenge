@@ -4,7 +4,7 @@ export interface Payment {
     amount: number;
     customerAddress: string;
     currency: string;
-    status: string;
+    status: PaymentStatus;
     date: string;
     description: string;
     clientId?: string;
@@ -16,3 +16,9 @@ export interface PaymentSearchResponse {
     page: number;
     pageSize: number;
 }
+
+type PaymentStatus =
+    | "completed"
+    | "pending"
+    | "failed"
+    | "refunded";

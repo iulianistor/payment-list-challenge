@@ -22,7 +22,7 @@ export const FlexRow = styled.div`
 
   @media (min-width: 768px) {
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
   }
 `;
@@ -157,8 +157,8 @@ export const StatusBadge = styled.span<{ status: string }>`
     props.status === "completed"
       ? `background-color: #d1fae5; color: #15803d;`
       : props.status === "pending"
-      ? `background-color: #fef3c7; color: #92400e;`
-      : `background-color: #fee2e2; color: #b91c1c;`}
+        ? `background-color: #fef3c7; color: #92400e;`
+        : `background-color: #fee2e2; color: #b91c1c;`}
 `;
 
 export const Spinner = styled.div`
