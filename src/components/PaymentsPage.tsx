@@ -16,7 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { PaymentsTable } from "./PaymentsTable";
 import { CURRENCIES } from "../constants";
 
-// keeping this in the UI layer ebecause this is responsible for rendering loading, error and empty states, and I want to keep the API logic in the service layer
+// keeping this in the UI layer because this is responsible for rendering loading, error and empty states, and I want to keep the API logic in the service layer
 // const EMPTY_PAYMENTS_RESPONSE: PaymentSearchResponse = {
 //   payments: [],
 //   total: 0,
@@ -31,7 +31,7 @@ export const PaymentsPage = () => {
   const [page, setPage] = useState(1);
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["payments", search, currency, page], //ensure that the query is refetched when any of these change
+    queryKey: ["payments", search, currency, page],
     queryFn: () =>
       getPayments({
         search,
@@ -39,6 +39,7 @@ export const PaymentsPage = () => {
         page,
         pageSize: 5,
       }),
+    placeholderData: (previousData) => previousData,
   });
 
   // const paymentsData =
