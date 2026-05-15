@@ -23,7 +23,7 @@ export const waitForErrorMessage = async (expectedMessage: string, timeout = 100
     // If the expected message isn't found, let's see what error messages are actually on the page
     const errorElements = screen.queryAllByText(/error|not found|server/i);
     const errorTexts = errorElements.map(el => el.textContent).filter(Boolean);
-    
+
     throw new Error(
       `Expected error message "${expectedMessage}" not found. ` +
       `Available error-related text: ${errorTexts.join(', ') || 'None found'}`
@@ -89,8 +89,13 @@ describe("App - Step 1: Basic Payment List", () => {
     expect(screen.getByText(I18N.TABLE_HEADER_STATUS)).toBeInTheDocument();
 
     // Check that 5 payments are displayed (pageSize=5)
-    const tableRows = screen.getAllByRole("row");
-    expect(tableRows).toHaveLength(6); // 1 header row + 5 data rows
+    // With loading state, we need to wait for the table to update after loading
+    await waitFor(() => {
+      expect(screen.getAllByRole("row")).toHaveLength(6); // 1 header row + 5 data rows
+    });
+    // await screen.findByText("pay_134_1");
+    // const tableRows = screen.getAllByRole("row");
+    // expect(tableRows).toHaveLength(6); 
   });
 });
 
