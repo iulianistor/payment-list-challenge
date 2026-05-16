@@ -1,20 +1,18 @@
 import React, { useState } from "react";
-import {
-  Container,
-  ClearButton,
-  FlexRow,
-  SearchButton,
-  SearchInput,
-  Select,
-  Title,
-  PaginationButton,
-  PaginationRow,
-} from "./components";
-import { I18N } from "../constants/i18n";
-import { getPayments } from "../services/payments";
+
+import { Container } from "@/components/layout/Container";
 import { useQuery } from "@tanstack/react-query";
+import { getPayments } from "@/services/payments";
+import { Title } from "@/components/layout/Title";
+import { I18N } from "@/constants/i18n";
+import { FlexRow } from "@/components/layout/FlexRow";
+import { SearchInput } from "@/components/form/SearchInput";
+import { Select } from "@/components/form/Select";
+import { CURRENCIES } from "@/constants";
+import { SearchButton } from "@/components/form/SearchButton";
+import { ClearButton } from "@/components/form/ClearButton";
 import { PaymentsTable } from "./PaymentsTable";
-import { CURRENCIES } from "../constants";
+import { Pagination } from "./pagination/Pagination";
 
 // keeping this in the UI layer because this is responsible for rendering loading, error and empty states, and I want to keep the API logic in the service layer
 // const EMPTY_PAYMENTS_RESPONSE: PaymentSearchResponse = {
@@ -116,21 +114,12 @@ export const PaymentsPage = () => {
         isError={isError}
         error={error}
       />
-
-      <PaginationRow>
-        <PaginationButton onClick={handlePreviousPage} disabled={page === 1}>
-          {I18N.PREVIOUS_BUTTON}
-        </PaginationButton>
-        <span>
-          {I18N.PAGE_LABEL} {page}
-        </span>
-        <PaginationButton
-          onClick={handleNextPage}
-          disabled={data ? page >= Math.ceil(data.total / data.pageSize) : true}
-        >
-          {I18N.NEXT_BUTTON}
-        </PaginationButton>
-      </PaginationRow>
+      <Pagination
+        page={page}
+        totalPages={data ? Math.ceil(data.total / data.pageSize) : 1}
+        onNext={handleNextPage}
+        onPrevious={handlePreviousPage}
+      />
     </Container>
   );
 };

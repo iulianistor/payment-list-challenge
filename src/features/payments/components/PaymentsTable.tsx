@@ -1,22 +1,21 @@
-import { I18N } from "../constants/i18n";
-import { formatCurrency } from "../utils/formatCurrency";
-import { formatDate } from "../utils/formatDate";
-import { PaymentSearchResponse } from "../types/payment";
-import {
-    EmptyBox,
-    ErrorBox,
-    Spinner,
-    StatusBadge,
-    Table,
-    TableBodyWrapper,
-    TableCell,
-    TableHeader,
-    TableHeaderRow,
-    TableHeaderWrapper,
-    TableRow,
-    TableWrapper,
-} from "./components";
-import { isApiError } from "../services/payments";
+import { ErrorBox } from "@/components/feedback/EmptyBox";
+import { EmptyBox } from "@/components/feedback/ErrorBox";
+import { Spinner } from "@/components/feedback/Spinner";
+import { StatusBadge } from "@/components/status/StatusBadge";
+import { Table } from "@/components/table/Table";
+import { TableBodyWrapper } from "@/components/table/TableBodyWrapper";
+import { TableCell } from "@/components/table/TableCell";
+import { TableHeader } from "@/components/table/TableHeader";
+import { TableHeaderRow } from "@/components/table/TableHeaderRow";
+import { TableHeaderWrapper } from "@/components/table/TableHeaderWrapper";
+import { TableRow } from "@/components/table/TableRow";
+import { TableWrapper } from "@/components/table/TableWrapper";
+import { I18N } from "@/constants/i18n";
+import { isApiError } from "@/services/payments";
+import { PaymentSearchResponse } from "@/types/payment";
+import { formatCurrency } from "@/utils/formatCurrency";
+import { formatDate } from "@/utils/formatDate";
+
 
 interface PaymentsTableProps {
     data?: PaymentSearchResponse;

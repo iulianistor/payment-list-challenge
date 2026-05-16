@@ -4,8 +4,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { expect, test } from "vitest";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PaymentsPage } from "./PaymentsPage";
-import { I18N } from "../constants/i18n";
-import { getSearchInput } from "../test-utils";
+import { I18N } from "../../../constants/i18n";
+import { getSearchInput } from "../../../test-utils";
 
 const queryClient = new QueryClient({
     defaultOptions: {

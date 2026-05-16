@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
+import '../index.css';
 import App from './App';
 
 async function enableMocking() {
@@ -9,7 +9,7 @@ async function enableMocking() {
   }
 
   try {
-    const { worker } = await import('./mocks/browser');
+    const { worker } = await import('../mocks/browser');
     await worker.start();
     console.log('Mock Service Worker started');
   } catch (error) {

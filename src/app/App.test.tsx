@@ -8,10 +8,10 @@ import {
   expect,
   test,
 } from "vitest";
-import { server } from "./mocks/node";
+import { server } from "../mocks/node";
+import { I18N } from "../constants/i18n";
+import { getSearchInput, waitForErrorMessage } from "../test-utils";
 import App from "./App";
-import { I18N } from "./constants/i18n";
-import { getSearchInput, waitForErrorMessage } from "./test-utils";
 
 beforeAll(() => server.listen());
 afterAll(() => server.close());
