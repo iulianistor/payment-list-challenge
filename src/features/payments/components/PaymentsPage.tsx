@@ -14,62 +14,82 @@ import { ClearButton } from "@/components/form/ClearButton";
 import { PaymentsTable } from "./PaymentsTable";
 import { Pagination } from "./pagination/Pagination";
 
-// keeping this in the UI layer because this is responsible for rendering loading, error and empty states, and I want to keep the API logic in the service layer
-// const EMPTY_PAYMENTS_RESPONSE: PaymentSearchResponse = {
-//   payments: [],
-//   total: 0,
-//   page: 1,
-//   pageSize: 5,
-// };
+type DraftFilters = {
+  search: string;
+  currency: string;
+};
+
+type AppliedFilters = {
+  search: string;
+  currency: string;
+  page: number;
+};
 
 export const PaymentsPage = () => {
-  const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
-  const [currency, setCurrency] = useState("");
-  const [page, setPage] = useState(1);
+  // UI state (what user is currently typing/selecting)
+  const [draftFilters, setDraftFilters] = useState<DraftFilters>({
+    search: "",
+    currency: "",
+  });
+
+  // SINGLE source of truth for API
+  // API state (what is actually applied to the request)
+  const [appliedFilters, setAppliedFilters] = useState<AppliedFilters>({
+    search: "",
+    currency: "",
+    page: 1,
+  });
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["payments", search, currency, page],
+    queryKey: ["payments", appliedFilters],
     queryFn: () =>
       getPayments({
-        search,
-        currency,
-        page,
+        search: appliedFilters.search,
+        currency: appliedFilters.currency,
+        page: appliedFilters.page,
         pageSize: 5,
       }),
     placeholderData: (previousData) => previousData,
   });
 
-  // const paymentsData =
-  //   data ?? EMPTY_PAYMENTS_RESPONSE;
+  const hasActiveFilters = Boolean(
+    appliedFilters.search !== "" || appliedFilters.currency !== ""
+  );
 
-  const hasActiveFilters = Boolean(search || currency);
-
+  // search happens only on button click, commit eveything at once
+  // no need to rely on prev state here since I'm doing a full overwrite
   const handleSearch = () => {
-    setSearch(searchInput.trim());
-    setPage(1);
+    setAppliedFilters({
+      search: draftFilters.search.trim(),
+      currency: draftFilters.currency,
+      page: 1,
+    });
   };
 
-  const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCurrency(e.target.value);
-    setPage(1);
-  }
-
+  // clear everything
   const handleClear = () => {
-    setSearchInput("");
-    setSearch("");
-    setCurrency("");
-    setPage(1);
+    setDraftFilters({ search: "", currency: "" });
+
+    setAppliedFilters({
+      search: "",
+      currency: "",
+      page: 1,
+    });
   };
 
+  // pagination
   const handleNextPage = () => {
-    setPage((prev) => prev + 1);
+    setAppliedFilters((prev) => ({
+      ...prev,
+      page: prev.page + 1,
+    }));
   };
 
   const handlePreviousPage = () => {
-    if (page > 1) {
-      setPage((prev) => prev - 1);
-    }
+    setAppliedFilters((prev) => ({
+      ...prev,
+      page: Math.max(prev.page - 1, 1),
+    }));
   };
 
   return (
@@ -77,24 +97,33 @@ export const PaymentsPage = () => {
       <Title>{I18N.PAGE_TITLE}</Title>
 
       <FlexRow>
+        {/* UI state only */}
         <SearchInput
           type="search"
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          placeholder={I18N.SEARCH_PLACEHOLDER}
+          value={draftFilters.search}
+          onChange={(e) =>
+            setDraftFilters((prev) => ({
+              ...prev,
+              search: e.target.value,
+            }))
+          } placeholder={I18N.SEARCH_PLACEHOLDER}
           aria-label={I18N.SEARCH_LABEL}
         />
 
+        {/* Currency dropdown is also UI only */}
         <Select
           aria-label={I18N.CURRENCY_FILTER_LABEL}
-          value={currency}
-          onChange={
-            handleCurrencyChange}
-          style={{ marginLeft: 8 }}
+          value={draftFilters.currency}
+          onChange={(e) =>
+            setDraftFilters((prev) => ({
+              ...prev,
+              currency: e.target.value,
+            }))
+          }
         >
           <option value="">{I18N.CURRENCIES_OPTION}</option>
           {CURRENCIES.filter((c) =>
-            ["USD", "EUR", "GBP", "AUD", "CAD", "ZAR"].includes(c),
+            ["USD", "EUR", "GBP", "AUD", "CAD", "ZAR"].includes(c)
           ).map((c) => (
             <option key={c} value={c}>
               {c}
@@ -102,9 +131,14 @@ export const PaymentsPage = () => {
           ))}
         </Select>
 
-        <SearchButton onClick={handleSearch}>{I18N.SEARCH_BUTTON}</SearchButton>
+        <SearchButton onClick={handleSearch}>
+          {I18N.SEARCH_BUTTON}
+        </SearchButton>
+
         {hasActiveFilters && (
-          <ClearButton onClick={handleClear}>{I18N.CLEAR_FILTERS}</ClearButton>
+          <ClearButton onClick={handleClear}>
+            {I18N.CLEAR_FILTERS}
+          </ClearButton>
         )}
       </FlexRow>
 
@@ -114,8 +148,9 @@ export const PaymentsPage = () => {
         isError={isError}
         error={error}
       />
+
       <Pagination
-        page={page}
+        page={appliedFilters.page}
         totalPages={data ? Math.ceil(data.total / data.pageSize) : 1}
         onNext={handleNextPage}
         onPrevious={handlePreviousPage}
