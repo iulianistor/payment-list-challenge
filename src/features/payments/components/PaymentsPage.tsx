@@ -79,6 +79,7 @@ export const PaymentsPage = () => {
 
   // pagination
   const handleNextPage = () => {
+    console.log("NEXT PAGE");
     setAppliedFilters((prev) => ({
       ...prev,
       page: prev.page + 1,

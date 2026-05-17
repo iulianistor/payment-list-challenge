@@ -18,7 +18,6 @@ const allPayments: any[] = [
   ...mockPayments123,
   ...mockPayments000,
 ];
-
 // Create a map for payment ID lookup
 const paymentIdMap: { [key: string]: any } = {};
 allPayments.forEach(payment => {
@@ -27,6 +26,7 @@ allPayments.forEach(payment => {
 
 export const handlers = [
   http.get(`*${API_URL}`, async ({ request }) => {
+    console.log("MSW HIT");
     const url = new URL(request.url);
     const search = url.searchParams.get("search")?.toLowerCase() || "";
     const currency = url.searchParams.get("currency") || "";
@@ -59,16 +59,17 @@ export const handlers = [
     // Filter payments based on search criteria and filters
     filteredPayments = allPayments.filter((pay) => {
       // Search filter
-      const matchesSearch = !search || 
+      const matchesSearch = !search ||
         pay.id.toLowerCase().includes(search) ||
         pay.status?.toLowerCase().includes(search) ||
         pay.currency?.toLowerCase().includes(search);
-      
+
       // Currency filter
       const matchesCurrency = !currency || pay.currency === currency;
-      
+
       return matchesSearch && matchesCurrency;
     });
+
 
     if (filteredPayments.length === 0) {
       return HttpResponse.json(
@@ -76,7 +77,6 @@ export const handlers = [
         { status: 404, statusText: "Not Found" }
       );
     }
-
     const total = filteredPayments.length;
     const start = (page - 1) * pageSize;
     const paginatedPayments = filteredPayments.slice(start, start + pageSize);
